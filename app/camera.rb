@@ -3,23 +3,78 @@ class BHSCamera < NSObject
 
   def init
     NSLog("camera initializing")
+    self.withSession do
+      self.add_input_device
+      self.add_output
+      @max_zoom = @device.activeFormat().videoMaxZoomFactor if @device
+
+      @session.startRunning if @output
+    end
+    self
+  end
+
+  def withSession
     @session = AVCaptureSession.alloc.init
     if @session
       @session.sessionPreset = AVCaptureSessionPresetHigh
+      yield
+    end
+  end
 
-      @device = AVCaptureDevice.defaultDeviceWithMediaType AVMediaTypeVideo
-      error = Pointer.new('@')
-      if @device
-        @input = AVCaptureDeviceInput.deviceInputWithDevice @device, error: error
-        @max_zoom = @device.activeFormat().videoMaxZoomFactor
-      end
-
+  def add_input_device
+    # TODO: handle errors
+    @device = AVCaptureDevice.defaultDeviceWithMediaType AVMediaTypeVideo
+    error = Pointer.new('@')
+    if @device
+      @input = AVCaptureDeviceInput.deviceInputWithDevice @device, error: error
       if @input
         @session.addInput @input
-        @session.startRunning
       end
     end
-    self
+  end
+
+  def add_output
+    if @device
+      @output = AVCaptureStillImageOutput.alloc.init
+      @output.setOutputSettings AVVideoCodecKey => AVVideoCodecJPEG
+      @session.addOutput @output
+    end
+  end
+
+  def take_picture(&completion_block)
+    NSLog "taking picture 1"
+    return unless @device
+
+    NSLog "taking picture 2"
+
+    @image = nil
+    @picture_completion_block = completion_block
+    video_connection = @output.connectionWithMediaType(AVMediaTypeVideo)
+
+    if video_connection
+      NSLog "found connection"
+      error = Pointer.new('@')
+      @output.captureStillImageAsynchronouslyFromConnection video_connection, completionHandler: lambda { |buffer, error|
+        imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation buffer
+        @image = UIImage.alloc.initWithData imageData
+        @picture_completion_block.call @image
+      }
+    end
+  end
+
+  def connection_with(media_type)
+    connection = nil
+    NSLog "loocing for video connection"
+    @output.connections.each do |c|
+      NSLog "connection %@", c
+      c.inputPorts do |port|
+        NSLog "port %@", port
+        if port.mediaType.isEqual media_type
+          connection = c
+        end
+      end
+    end
+    connection
   end
 
   def get_video_layer

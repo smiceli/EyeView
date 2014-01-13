@@ -38,6 +38,37 @@ class EyeViewController < UIViewController
     end
   end
 
+  def take_picture
+    NSLog "___________________________"
+    image = @camera.take_picture do |image|
+      if image
+        show_picture(image)
+      else
+        alert = UIAlertView.alloc.init
+        alert.title = "Error"
+        alert.message = "Can't capture picture"
+        alert.addButtonWithTitle('OK')
+        alert.show
+      end
+    end
+  end
+
+  def show_picture(image)
+    @image_view = BHSImageViewer.alloc.init
+    @image_view.image = image
+    @image_view.delegate = self
+    Motion::Layout.new do |layout|
+      layout.view self.view
+      layout.subviews "image" => @image_view
+      layout.vertical "|[image]|"
+      layout.horizontal "|[image]|"
+    end
+  end
+
+  def dismiss_image_viewer
+    @image_view.removeFromSuperview
+  end
+
   def light_tapped
     @camera.toggle_light
   end
