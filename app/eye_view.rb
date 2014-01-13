@@ -7,6 +7,7 @@ class EyeView < UIView
     if super
       self.backgroundColor = UIColor.redColor
       self.add_zoom_gesture
+      self.add_double_tap_gesture
     end
     self
   end
@@ -30,5 +31,15 @@ class EyeView < UIView
     if @delegate
       delegate.zoom(scale)
     end
+  end
+
+  def add_double_tap_gesture
+    g = UITapGestureRecognizer.alloc.initWithTarget self, action: :"double_tapped:"
+    g.numberOfTapsRequired = 2
+    self.addGestureRecognizer g
+  end
+
+  def double_tapped(recognizer)
+    @delegate.take_picture if @delegate
   end
 end

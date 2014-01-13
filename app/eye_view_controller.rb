@@ -39,7 +39,6 @@ class EyeViewController < UIViewController
   end
 
   def take_picture
-    NSLog "___________________________"
     image = @camera.take_picture do |image|
       if image
         show_picture(image)

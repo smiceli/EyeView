@@ -42,17 +42,13 @@ class BHSCamera < NSObject
   end
 
   def take_picture(&completion_block)
-    NSLog "taking picture 1"
     return unless @device
-
-    NSLog "taking picture 2"
 
     @image = nil
     @picture_completion_block = completion_block
     video_connection = @output.connectionWithMediaType(AVMediaTypeVideo)
 
     if video_connection
-      NSLog "found connection"
       error = Pointer.new('@')
       @output.captureStillImageAsynchronouslyFromConnection video_connection, completionHandler: lambda { |buffer, error|
         imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation buffer
@@ -64,11 +60,8 @@ class BHSCamera < NSObject
 
   def connection_with(media_type)
     connection = nil
-    NSLog "loocing for video connection"
     @output.connections.each do |c|
-      NSLog "connection %@", c
       c.inputPorts do |port|
-        NSLog "port %@", port
         if port.mediaType.isEqual media_type
           connection = c
         end
@@ -87,7 +80,6 @@ class BHSCamera < NSObject
 
   def with_locked_config
     error = Pointer.new('@')
-    NSLog("with_locked_config %@", @device)
     if @device and @device.lockForConfiguration error
       yield
       @device.unlockForConfiguration 
@@ -95,17 +87,14 @@ class BHSCamera < NSObject
   end
 
   def toggle_light
-    NSLog("toggle_light")
     self.with_locked_config do
       if @device.hasTorch
-        NSLog("toggle_light 2")
         @device.torchMode = self.negate_light_setting @device.torchMode
       end
     end
   end
 
   def negate_light_setting(torch_mode)
-    NSLog("negate")
     if torch_mode == AVCaptureTorchModeOn
       AVCaptureTorchModeOff
     else

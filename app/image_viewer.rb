@@ -3,7 +3,6 @@ class BHSImageViewer < UIView
   attr_accessor :image
 
   def initWithFrame(frame)
-    NSLog "adding image viewer"
     if super
       self.add_image_view
       self.add_double_tap_gesture
