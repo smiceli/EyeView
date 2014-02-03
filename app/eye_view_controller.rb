@@ -56,6 +56,7 @@ class EyeViewController < UIViewController
     @image_view = BHSImageViewer.alloc.init
     @image_view.image = image
     @image_view.delegate = self
+
     Motion::Layout.new do |layout|
       layout.view self.view
       layout.subviews "image" => @image_view

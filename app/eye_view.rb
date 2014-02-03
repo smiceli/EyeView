@@ -7,7 +7,7 @@ class EyeView < UIView
     if super
       self.backgroundColor = UIColor.redColor
       self.add_zoom_gesture
-      self.add_double_tap_gesture
+      self.add_freeze_gesture
     end
     self
   end
@@ -33,13 +33,13 @@ class EyeView < UIView
     end
   end
 
-  def add_double_tap_gesture
-    g = UITapGestureRecognizer.alloc.initWithTarget self, action: :"double_tapped:"
+  def add_freeze_gesture
+    g = UITapGestureRecognizer.alloc.initWithTarget self, action: :"freeze_picture:"
     g.numberOfTapsRequired = 2
     self.addGestureRecognizer g
   end
 
-  def double_tapped(recognizer)
+  def freeze_picture(recognizer)
     @delegate.take_picture if @delegate
   end
 end

@@ -6,6 +6,7 @@ class BHSCamera < NSObject
     self.withSession do
       self.add_input_device
       self.add_output
+
       @max_zoom = @device.activeFormat().videoMaxZoomFactor if @device
 
       @session.startRunning if @output
@@ -24,47 +25,60 @@ class BHSCamera < NSObject
   def add_input_device
     # TODO: handle errors
     @device = AVCaptureDevice.defaultDeviceWithMediaType AVMediaTypeVideo
-    error = Pointer.new('@')
-    if @device
-      @input = AVCaptureDeviceInput.deviceInputWithDevice @device, error: error
-      if @input
-        @session.addInput @input
-      end
+    if not @device
+      NSLog("no capture device")
+      return
     end
+
+    error = Pointer.new('@')
+    @input = AVCaptureDeviceInput.deviceInputWithDevice @device, error: error
+    if not @input
+      NSLog("not input device")
+      return
+    end
+
+    @session.addInput @input
   end
 
   def add_output
-    if @device
-      @output = AVCaptureStillImageOutput.alloc.init
-      @output.setOutputSettings AVVideoCodecKey => AVVideoCodecJPEG
-      @session.addOutput @output
-    end
+    return unless @device
+
+    @output = AVCaptureStillImageOutput.alloc.init
+    @output.setOutputSettings AVVideoCodecKey => AVVideoCodecJPEG
+    @session.addOutput @output
+  end
+
+  def fake_picture
+    UIImage.imageNamed "picture.jpg"
   end
 
   def take_picture(&completion_block)
-    return unless @device
+
+    @picture_completion_block = completion_block
+
+    if not @device
+      @image = self.fake_picture
+      @picture_completion_block.call @image
+      return
+    end
 
     @image = nil
-    @picture_completion_block = completion_block
     video_connection = @output.connectionWithMediaType(AVMediaTypeVideo)
+    return unless video_connection
 
-    if video_connection
-      error = Pointer.new('@')
-      @output.captureStillImageAsynchronouslyFromConnection video_connection, completionHandler: lambda { |buffer, error|
-        imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation buffer
-        @image = UIImage.alloc.initWithData imageData
-        @picture_completion_block.call @image
-      }
-    end
+    error = Pointer.new('@')
+    @output.captureStillImageAsynchronouslyFromConnection video_connection, completionHandler: lambda { |buffer, error|
+      imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation buffer
+      @image = UIImage.alloc.initWithData imageData
+      @picture_completion_block.call @image
+    }
   end
 
   def connection_with(media_type)
     connection = nil
     @output.connections.each do |c|
       c.inputPorts do |port|
-        if port.mediaType.isEqual media_type
-          connection = c
-        end
+        connectino = c if port.mediaType.isEqual media_type
       end
     end
     connection
