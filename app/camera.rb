@@ -74,16 +74,6 @@ class BHSCamera < NSObject
     }
   end
 
-  def connection_with(media_type)
-    connection = nil
-    @output.connections.each do |c|
-      c.inputPorts do |port|
-        connectino = c if port.mediaType.isEqual media_type
-      end
-    end
-    connection
-  end
-
   def get_video_layer
     previewLayer = AVCaptureVideoPreviewLayer.alloc.initWithSession(@session)
     if previewLayer
