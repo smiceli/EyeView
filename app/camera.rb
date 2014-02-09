@@ -1,5 +1,6 @@
 class BHSCamera < NSObject
   attr_reader :max_zoom
+  attr_accessor :orientation
 
   def init
     NSLog("camera initializing")
@@ -7,6 +8,7 @@ class BHSCamera < NSObject
       self.add_input_device
       self.add_output
 
+      @orientation = AVCaptureVideoOrientationPortrait
       @max_zoom = @device.activeFormat().videoMaxZoomFactor if @device
 
       @session.startRunning if @output
@@ -66,6 +68,8 @@ class BHSCamera < NSObject
     video_connection = @output.connectionWithMediaType(AVMediaTypeVideo)
     return unless video_connection
 
+    video_connection.videoOrientation = @orientation
+
     error = Pointer.new('@')
     @output.captureStillImageAsynchronouslyFromConnection video_connection, completionHandler: lambda { |buffer, error|
       imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation buffer
@@ -75,11 +79,21 @@ class BHSCamera < NSObject
   end
 
   def get_video_layer
-    previewLayer = AVCaptureVideoPreviewLayer.alloc.initWithSession(@session)
-    if previewLayer
-      previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
+    if not @preview_layer
+      @preview_layer = AVCaptureVideoPreviewLayer.alloc.initWithSession(@session)
+      if @preview_layer
+        @preview_layer.videoGravity = AVLayerVideoGravityResizeAspectFill
+        @preview_layer.connection.videoOrientation = @orientation if @preview_layer.connection
+      end
     end
-    previewLayer
+    @preview_layer
+  end
+
+  def orientation=(orientation)
+    video_layer = self.get_video_layer
+    connection = video_layer.connection if video_layer
+    connection.videoOrientation = orientation if connection
+    @orientation = orientation
   end
 
   def with_locked_config

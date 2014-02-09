@@ -16,8 +16,8 @@ class EyeViewHud < UIView
     Motion::Layout.new {|layout|
       layout.view self
       layout.subviews "light" => @light_button
-      layout.vertical "|-(>=20)-[light(40)]-20-|"
-      layout.horizontal "|-(>=20)-[light(40)]-20-|"
+      layout.vertical "[light(40)]-|"
+      layout.horizontal "[light(40)]-|"
     }
   end
 

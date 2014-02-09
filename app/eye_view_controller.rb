@@ -1,29 +1,33 @@
 class EyeViewController < UIViewController
+  
   def loadView
     @camera = BHSCamera.alloc.init
-    self.view = self.camera_view
-    self.view.addSubview self.hud_view
+    self.add_camera_view
+    self.add_hud_view
   end
 
-  def camera_view
-    puts 'view'
+  def add_camera_view
     view = EyeView.alloc.initWithFrame UIScreen.mainScreen.bounds
     view.min_scale = 1.0
     view.max_scale = @camera.max_zoom
     view.delegate = self
     self.add_camera_layer_to(view)
-    view
+    self.view = view
   end
 
-  def hud_view
-    puts 'hud'
+  def add_hud_view
     hud = EyeViewHud.alloc.initWithFrame self.view.bounds
     hud.delegate = self
+    Motion::Layout.new {|layout|
+      layout.view self.view
+      layout.subviews "HUD" => hud
+      layout.vertical "[HUD(40)]-0-|"
+      layout.horizontal "[HUD(40)]-0-|"
+    }
     hud
   end
 
   def add_camera_layer_to(view)
-    puts 'layer'
     @camera_layer = @camera.get_video_layer
     if @camera_layer
       @camera_layer.frame = view.bounds;
@@ -35,6 +39,7 @@ class EyeViewController < UIViewController
   def viewWillLayoutSubviews
     if @camera_layer
       @camera_layer.frame = self.view.bounds
+      @camera.orientation = UIApplication.sharedApplication.statusBarOrientation
     end
   end
 
