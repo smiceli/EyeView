@@ -33,6 +33,25 @@ class BHSImageViewer < UIView
     if @image_view.frame.size.width == 0
       @image_view.frame = self.bounds
     end
+
+    image_aspect = @image_view.image.size.width / @image_view.image.size.height
+    view_aspect = self.frame.size.width / self.frame.size.height
+    NSLog("aspect v: %@ i: %@", view_aspect, image_aspect)
+    if (view_aspect - image_aspect).abs < 0.01
+      @scroll_view.minimumZoomScale = 1
+    else
+      @scroll_view.minimumZoomScale = [view_aspect, image_aspect].max
+    end
+
+    if self.size.width < self.size.height
+      @scroll_view.zoomScale = @image_view.frame.size.width / self.frame.size.width
+    else
+      @scroll_view.zoomScale = @image_view.frame.size.height / self.frame.size.height
+    end
+
+
+    NSLog("zoom: %@", @scroll_view.minimumZoomScale)
+
   end
 
   def add_image_view
