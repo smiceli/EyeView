@@ -27,14 +27,14 @@ class BHSCamera < NSObject
   def add_input_device
     # TODO: handle errors
     @device = AVCaptureDevice.defaultDeviceWithMediaType AVMediaTypeVideo
-    if not @device
+    unless @device
       NSLog("no capture device")
       return
     end
 
     error = Pointer.new('@')
     @input = AVCaptureDeviceInput.deviceInputWithDevice @device, error: error
-    if not @input
+    unless @input
       NSLog("not input device")
       return
     end
@@ -50,33 +50,32 @@ class BHSCamera < NSObject
     @session.addOutput @output
   end
 
-  def fake_picture
-    UIImage.imageNamed "picture.jpg"
+  def take_fake_picture(completion_block)
+      @image = UIImage.imageNamed "picture.jpg"
+      completion_block.call @image
   end
 
   def take_picture(&completion_block)
-
-    @picture_completion_block = completion_block
-
-    if not @device
-      @image = self.fake_picture
-      @picture_completion_block.call @image
-      return
-    end
-
     @image = nil
+    return take_fake_picture completion_block unless @device
+
     video_connection = @output.connectionWithMediaType(AVMediaTypeVideo)
     return unless video_connection
 
     video_connection.videoOrientation = @orientation
-
-    error = Pointer.new('@')
-    @output.captureStillImageAsynchronouslyFromConnection video_connection, completionHandler: lambda { |buffer, error|
-      imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation buffer
-      @image = UIImage.alloc.initWithData imageData
-      @picture_completion_block.call @image
-    }
+    self.take_picture_using_connection video_connection, completion_block
   end
+
+  def take_picture_using_connection(video_connection, completion_block)
+    error = Pointer.new('@')
+    @output.captureStillImageAsynchronouslyFromConnection(video_connection, completionHandler:
+      lambda { |buffer, error|
+        imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation buffer
+        @image = UIImage.alloc.initWithData imageData
+        completion_block.call @image
+      }
+    )
+end
 
   def get_video_layer
     if not @preview_layer
