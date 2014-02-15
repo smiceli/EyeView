@@ -134,15 +134,4 @@ end
     end
     zoom
   end
-
-  def get_back_camera
-    devices = AVCaptureDevice.devices
-    NSLog("getting devices")
-    devices.each {|d|
-      NSLog("%@", d.localizedName)
-      if d.hasMediaType AVMediaTypeVideo
-        NSLog("has video")
-      end
-    }
-  end
 end
