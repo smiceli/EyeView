@@ -19,7 +19,7 @@ class BHSCamera < NSObject
   def withSession
     @session = AVCaptureSession.alloc.init
     if @session
-      @session.sessionPreset = AVCaptureSessionPresetHigh
+      @session.sessionPreset = AVCaptureSessionPresetPhoto
       yield
     end
   end
@@ -48,6 +48,9 @@ class BHSCamera < NSObject
     @output = AVCaptureStillImageOutput.alloc.init
     @output.setOutputSettings AVVideoCodecKey => AVVideoCodecJPEG
     @session.addOutput @output
+  end
+
+  def shutdown_video
   end
 
   def take_fake_picture(completion_block)
@@ -130,7 +133,7 @@ end
     if zoom < 1.0
       zoom = 1.0
     elsif zoom > @max_zoom
-      zoom = @max_zoom
+      zoom = @max_zooa
     end
     zoom
   end
