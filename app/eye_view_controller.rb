@@ -2,6 +2,7 @@ class EyeViewController < UIViewController
   
   def loadView
     @camera = BHSCamera.alloc.init
+    @image_store = BHSImageStore.new
     self.add_camera_view
     self.add_hud_view
   end
@@ -44,7 +45,7 @@ class EyeViewController < UIViewController
   end
 
   def take_picture
-    image = @camera.take_picture do |image|
+    @camera.take_picture do |image|
       if image
         show_picture(image)
       else
@@ -58,20 +59,15 @@ class EyeViewController < UIViewController
   end
 
   def show_picture(image)
-    @image_view = BHSImageViewer.alloc.init
-    @image_view.image = image
-    @image_view.delegate = self
-
-    Motion::Layout.new do |layout|
-      layout.view self.view
-      layout.subviews "image" => @image_view
-      layout.vertical "|[image]|"
-      layout.horizontal "|[image]|"
-    end
+    @image_store.store image
+    @image_array_viewer = BHSImageArrayViewController.alloc.initWithTransitionStyle(UIPageViewControllerTransitionStyleScroll, navigationOrientation: UIPageViewControllerNavigationOrientationHorizontal, options: nil)
+    @image_array_viewer.image_store = @image_store
+    @image_array_viewer.view_delegate = self
+    self.presentViewController(@image_array_viewer, animated:false, completion:nil)
   end
 
   def dismiss_image_viewer
-    @image_view.removeFromSuperview
+    @image_array_viewer.dismissViewControllerAnimated(false, completion:nil)
   end
 
   def light_tapped

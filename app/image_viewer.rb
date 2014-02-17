@@ -92,6 +92,20 @@ class BHSImageViewer < UIView
     end
   end
 
+  def frame_for_image(image)
+    frame = @image_view.frame
+    if self.image_orientation(image) != self.orientation
+      x = frame.origin.x
+      frame.origin.x = frame.origin.y
+      frame.origin.y = x
+
+      w = frame.size.width
+      frame.size.width = frame.size.height
+      frame.size.height = w
+    end
+    frame
+  end
+
   def setup_initial_image_view
     if @layed_out_image != @image_view.image
       @layed_out_image = @image_view.image
@@ -99,7 +113,7 @@ class BHSImageViewer < UIView
       @image_view.frame = self.initial_frame_for_image @image_view.image, self.orientation
       self.center_in_scroll_view @image_view
       @scroll_view.zoomScale = 1.0
-      @original_frame = @image_view.frame
+      @original_frame = self.frame_for_image @image_view.image
     end
   end
 
