@@ -47,6 +47,7 @@ class EyeViewController < UIViewController
   def take_picture
     @camera.take_picture do |image|
       if image
+        @camera.stop_video
         show_picture(image)
       else
         alert = UIAlertView.alloc.init
@@ -67,6 +68,7 @@ class EyeViewController < UIViewController
   end
 
   def dismiss_image_viewer
+    @camera.start_video
     @image_array_viewer.dismissViewControllerAnimated(false, completion:nil)
   end
 

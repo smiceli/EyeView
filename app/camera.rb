@@ -11,7 +11,7 @@ class BHSCamera < NSObject
       @orientation = AVCaptureVideoOrientationPortrait
       @max_zoom = @device.activeFormat().videoMaxZoomFactor if @device
 
-      @session.startRunning if @output
+      self.start_video
     end
     self
   end
@@ -50,7 +50,12 @@ class BHSCamera < NSObject
     @session.addOutput @output
   end
 
-  def shutdown_video
+  def start_video
+      @session.startRunning if @output
+  end
+
+  def stop_video
+      @session.stopRunning if @output
   end
 
   def take_fake_picture(completion_block)
