@@ -1,4 +1,6 @@
 class EyeViewController < UIViewController
+
+  attr_accessor :light_brightness
   
   def loadView
     @camera = BHSCamera.alloc.init
@@ -22,8 +24,8 @@ class EyeViewController < UIViewController
     Motion::Layout.new {|layout|
       layout.view self.view
       layout.subviews "HUD" => hud
-      layout.vertical "[HUD(40)]-0-|"
-      layout.horizontal "[HUD(40)]-0-|"
+      layout.vertical "|-0-[HUD]-0-|"
+      layout.horizontal "|-0-[HUD]-0-|"
     }
     hud
   end
@@ -72,8 +74,16 @@ class EyeViewController < UIViewController
     @image_array_viewer.dismissViewControllerAnimated(false, completion:nil)
   end
 
-  def light_tapped
-    @camera.toggle_light
+  def light_on(is_light_on)
+    @camera.light_on = is_light_on
+  end
+
+  def light_brightness
+    @camera.light_brightness
+  end
+
+  def light_brightness=(brightness)
+    @camera.light_brightness = brightness
   end
 
   def zoom(scale)

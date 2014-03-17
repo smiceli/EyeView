@@ -1,6 +1,8 @@
 class BHSCamera < NSObject
   attr_reader :max_zoom
   attr_accessor :orientation
+  attr_accessor :light_on
+  attr_accessor :light_brightness
 
   def init
     NSLog("camera initializing")
@@ -10,6 +12,7 @@ class BHSCamera < NSObject
 
       @orientation = AVCaptureVideoOrientationPortrait
       @max_zoom = @device.activeFormat().videoMaxZoomFactor if @device
+      @light_brightness = 1.0
 
       self.start_video
     end
@@ -111,19 +114,23 @@ end
     end
   end
 
-  def toggle_light
+  def light_on=(turn_on)
     self.with_locked_config do
-      if @device.hasTorch
-        @device.torchMode = self.negate_light_setting @device.torchMode
+      if turn_on
+        error = Pointer.new('@')
+        @device.setTorchModeOnWithLevel(@light_brightness, error:error) if @light_brightness > 0.0
+      else
+        @device.torchMode = AVCaptureTorchModeOff
       end
+      @light_on = turn_on
     end
   end
 
-  def negate_light_setting(torch_mode)
-    if torch_mode == AVCaptureTorchModeOn
-      AVCaptureTorchModeOff
-    else
-      AVCaptureTorchModeOn
+  def light_brightness=(brightness)
+    self.with_locked_config do
+      error = Pointer.new('@')
+      @device.setTorchModeOnWithLevel(brightness, error:error) if brightness > 0.0
+      @light_brightness = brightness
     end
   end
 
