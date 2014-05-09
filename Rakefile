@@ -17,4 +17,5 @@ Motion::Project::App.setup do |app|
   app.codesign_certificate = 'iPhone Developer: Sean Miceli (RKYL64RF52)'
   app.provisioning_profile = '/Users/smiceli/Library/MobileDevice/Provisioning Profiles/FCDA2B2F-BDB9-4FBF-A11B-D3CDE501FC12.mobileprovision'
   app.frameworks += ['AVFoundation']
+  app.device_family = [:iphone, :ipad]
 end
