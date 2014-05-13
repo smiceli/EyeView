@@ -6,31 +6,41 @@ class EyeView < UIView
   def initWithFrame(frame)
     if super
       self.backgroundColor = UIColor.redColor
-      self.add_zoom_gesture
+      self.add_zoom_gestures
       self.add_freeze_gesture
     end
     self
   end
 
-  def add_zoom_gesture
+  def add_zoom_gestures
     @scale = 1.0
     self.addGestureRecognizer UIPinchGestureRecognizer.alloc.initWithTarget(self, action: :"pinching:")
+    self.addGestureRecognizer UIPanGestureRecognizer.alloc.initWithTarget(self, action: :"panning:")
   end
 
   def pinching(recognizer)
-    scale = @scale * recognizer.scale
+    scale = self.adjust_scale(@scale * recognizer.scale, recognizer)
+  end
+
+  def panning(recognizer)
+    delta = recognizer.translationInView self
+    velocity = recognizer.velocityInView self
+    return if (delta.x.abs >= delta.y.abs)
+
+    inc = delta.y/20.0 * -1 #velocity.y/80.0
+    scale = self.adjust_scale(@scale + inc, recognizer)
+    NSLog("s: %@ i: %@ (%@, %@)", scale, inc,  delta.x, delta.y)
+  end
+
+  def adjust_scale(scale, recognizer)
     if scale < @min_scale
       scale = @min_scale
     elsif scale > @max_scale
       scale = @max_scale
     end
-    if recognizer.state == UIGestureRecognizerStateEnded
-      @scale = scale
-    end
-
-    if @delegate
-      delegate.zoom(scale)
-    end
+    @scale = scale if recognizer.state == UIGestureRecognizerStateEnded
+    delegate.zoom(scale) if @delegate
+    scale
   end
 
   def add_freeze_gesture
