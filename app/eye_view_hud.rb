@@ -11,7 +11,12 @@ class EyeViewHud < UIView
 
   def add_light_button
     @light_button = UIButton.alloc.init
-    @light_button.backgroundColor = UIColor.yellowColor().colorWithAlphaComponent 0.5
+    #@light_button.backgroundColor = UIColor.yellowColor().colorWithAlphaComponent 0.5
+    @light_button.setTitle("💡", forState:UIControlStateNormal)
+    @light_button.layer.borderColor = UIColor.whiteColor.CGColor
+    @light_button.layer.borderWidth = 1
+    @light_button.layer.cornerRadius = 8
+    @light_button.alpha = 0.5
     @light_button.addTarget self, action: :'light_tapped', forControlEvents:UIControlEventTouchUpInside
 
     Motion::Layout.new {|layout|
