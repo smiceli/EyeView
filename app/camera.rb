@@ -62,8 +62,8 @@ class BHSCamera < NSObject
   end
 
   def take_fake_picture(completion_block)
-      @image = UIImage.imageNamed "picture.jpg"
-      completion_block.call @image
+    @image = UIImage.imageNamed "picture.jpg"
+    completion_block.call @image
   end
 
   def take_picture(&completion_block)
@@ -86,7 +86,7 @@ class BHSCamera < NSObject
         completion_block.call @image
       }
     )
-end
+  end
 
   def get_video_layer
     if not @preview_layer
