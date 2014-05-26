@@ -63,6 +63,19 @@ class EyeViewController < UIViewController
 
   def show_picture(image)
     @image_store.store image
+    self.show_image_viewer
+  end
+
+  def show_image_viewer
+    if @image_store.images.count == 0
+      alert = UIAlertView.alloc.init
+      alert.title = ""
+      alert.message = "No images in history yet."
+      alert.addButtonWithTitle('OK')
+      alert.show
+      return
+    end
+
     @image_array_viewer = BHSImageArrayViewController.alloc.initWithTransitionStyle(UIPageViewControllerTransitionStyleScroll, navigationOrientation: UIPageViewControllerNavigationOrientationHorizontal, options: nil)
     @image_array_viewer.image_store = @image_store
     @image_array_viewer.view_delegate = self

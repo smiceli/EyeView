@@ -3,15 +3,36 @@ class EyeViewHud < UIView
 
   def initWithFrame(frame)
     if super
+      self.add_history_button
       self.add_light_button
       self.add_light_adjust_gesture
     end
     self
   end
 
+  def add_history_button
+    @history_button = UIButton.alloc.init
+    @history_button.setTitle("🕑 ", forState:UIControlStateNormal)
+    @history_button.layer.borderColor = UIColor.whiteColor.CGColor
+    @history_button.layer.borderWidth = 1
+    @history_button.layer.cornerRadius = 8
+    @history_button.alpha = 0.5
+    @history_button.addTarget self, action: :'history_tapped', forControlEvents:UIControlEventTouchUpInside
+
+    Motion::Layout.new {|layout|
+      layout.view self
+      layout.subviews "history" => @history_button
+      layout.vertical "[history(40)]-|"
+      layout.horizontal "|-[history(40)]"
+    }
+  end
+
+  def history_tapped
+    @delegate.show_image_viewer if @delegate
+  end
+
   def add_light_button
     @light_button = UIButton.alloc.init
-    #@light_button.backgroundColor = UIColor.yellowColor().colorWithAlphaComponent 0.5
     @light_button.setTitle("💡", forState:UIControlStateNormal)
     @light_button.layer.borderColor = UIColor.whiteColor.CGColor
     @light_button.layer.borderWidth = 1
@@ -66,8 +87,9 @@ class EyeViewHud < UIView
 
     self.addSubview(@brightness_slider)
   end
-end
 
-def brightness_change(sender)
-  @delegate.light_brightness = sender.value if @delegate
+  def brightness_change(sender)
+    @delegate.light_brightness = sender.value if @delegate
+  end
+
 end
