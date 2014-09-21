@@ -1,11 +1,11 @@
-class EyeView < UIView
+class CameraView < UIView
   attr_accessor :delegate
   attr_accessor :min_scale
   attr_accessor :max_scale
 
   def initWithFrame(frame)
     if super
-      self.backgroundColor = UIColor.redColor
+      self.backgroundColor = UIColor.blackColor
       self.add_zoom_gestures
       self.add_freeze_gesture
     end

@@ -22,7 +22,7 @@ class CameraControlView < UIView
   end
 
   def add_camera_view
-    @camera_view = EyeView.alloc.initWithFrame UIScreen.mainScreen.bounds
+    @camera_view = CameraView.alloc.initWithFrame UIScreen.mainScreen.bounds
     @camera_view.min_scale = 1.0
     @camera_view.max_scale = @camera.max_zoom
     self.add_camera_layer_to(@camera_view)
