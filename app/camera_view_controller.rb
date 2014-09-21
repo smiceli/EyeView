@@ -1,4 +1,4 @@
-class EyeViewController < UIViewController
+class CameraViewController < UIViewController
 
   attr_accessor :light_brightness
   
