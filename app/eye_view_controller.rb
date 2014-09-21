@@ -3,47 +3,22 @@ class EyeViewController < UIViewController
   attr_accessor :light_brightness
   
   def loadView
-    @camera = BHSCamera.alloc.init
     @image_store = BHSImageStore.new
-    self.add_camera_view
-    self.add_hud_view
+    self.add_camera
+    self.add_camera_control_view
   end
 
-  def add_camera_view
-    view = EyeView.alloc.initWithFrame UIScreen.mainScreen.bounds
-    view.min_scale = 1.0
-    view.max_scale = @camera.max_zoom
-    view.delegate = self
-    self.add_camera_layer_to(view)
-    self.view = view
-  end
-
-  def add_hud_view
-    hud = EyeViewHud.alloc.initWithFrame self.view.bounds
-    hud.delegate = self
-    Motion::Layout.new {|layout|
-      layout.view self.view
-      layout.subviews "HUD" => hud
-      layout.vertical "|-0-[HUD]-0-|"
-      layout.horizontal "|-0-[HUD]-0-|"
-    }
-    hud
-  end
-
-  def add_camera_layer_to(view)
-    @camera_layer = @camera.get_video_layer
-    if @camera_layer
-      @camera_layer.frame = view.bounds;
+  def add_camera
+    @camera = BHSCamera.alloc.init
+    if (!@camera.has_camera?)
+      @camera = BHSFakeCamera.alloc.init
     end
-    view.layer.addSublayer @camera_layer
-    @camera_layer
   end
 
-  def viewWillLayoutSubviews
-    if @camera_layer
-      @camera_layer.frame = self.view.bounds
-      @camera.orientation = UIApplication.sharedApplication.statusBarOrientation
-    end
+  def add_camera_control_view
+    @camera_control = CameraControlView.alloc.init_with_camera(@camera, UIScreen.mainScreen.bounds)
+    @camera_control.delegate = self
+    self.view = @camera_control
   end
 
   def take_picture

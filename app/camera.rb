@@ -19,6 +19,10 @@ class BHSCamera < NSObject
     self
   end
 
+  def has_camera?
+    return @device != nil
+  end
+
   def withSession
     @session = AVCaptureSession.alloc.init
     if @session
@@ -135,18 +139,9 @@ class BHSCamera < NSObject
   end
 
   def zoom(zoom)
-    zoom = cap_zoom(zoom)
+    zoom = zoom.clamp(1.0, @max_zoom)
     self.with_locked_config do
       @device.videoZoomFactor = zoom
     end
-  end
-
-  def cap_zoom(zoom)
-    if zoom < 1.0
-      zoom = 1.0
-    elsif zoom > @max_zoom
-      zoom = @max_zooa
-    end
-    zoom
   end
 end

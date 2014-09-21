@@ -33,11 +33,7 @@ class EyeView < UIView
   end
 
   def adjust_scale(scale, recognizer)
-    if scale < @min_scale
-      scale = @min_scale
-    elsif scale > @max_scale
-      scale = @max_scale
-    end
+    scale = scale.clamp(@min_scale, @max_scale)
     @scale = scale if recognizer.state == UIGestureRecognizerStateEnded
     delegate.zoom(scale) if @delegate
     scale
