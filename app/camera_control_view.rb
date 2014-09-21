@@ -30,7 +30,7 @@ class CameraControlView < UIView
   end
 
   def add_hud_view
-    @hud = EyeViewHud.alloc.initWithFrame self.bounds
+    @hud = CameraViewHud.alloc.initWithFrame self.bounds
     @hud.constrain_to_view(@camera_view)
   end
 

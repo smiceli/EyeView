@@ -1,4 +1,4 @@
-class EyeViewHud < UIView
+class CameraViewHud < UIView
   attr_accessor :delegate
 
   def initWithFrame(frame)
