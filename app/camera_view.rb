@@ -1,10 +1,13 @@
 class CameraView < UIView
-  attr_accessor :delegate
+  attr_accessor :picture_handler
   attr_accessor :min_scale
   attr_accessor :max_scale
 
-  def initWithFrame(frame)
-    if super
+  alias :'super_initWithFrame:' :'initWithFrame:'
+
+  def initWithFrame(frame, camera)
+    if super_initWithFrame(frame)
+      @camera = camera
       self.backgroundColor = UIColor.blackColor
       self.add_zoom_gestures
       self.add_freeze_gesture
@@ -35,17 +38,20 @@ class CameraView < UIView
   def adjust_scale(scale, recognizer)
     scale = scale.clamp(@min_scale, @max_scale)
     @scale = scale if recognizer.state == UIGestureRecognizerStateEnded
-    delegate.zoom(scale) if @delegate
+    @camera.zoom(scale.abs)
     scale
   end
 
   def add_freeze_gesture
-    g = UITapGestureRecognizer.alloc.initWithTarget self, action: :"freeze_picture:"
+    g = UITapGestureRecognizer.alloc.initWithTarget self, action: :"take_picture:"
     g.numberOfTapsRequired = 2
     self.addGestureRecognizer g
   end
 
-  def freeze_picture(recognizer)
-    @delegate.take_picture if @delegate
+  def take_picture(recognizer)
+    @camera.take_picture do |image|
+      @camera.stop_video
+      @picture_handler.handle_picture(image) if @picture_handler
+    end
   end
 end

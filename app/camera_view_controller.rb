@@ -21,18 +21,15 @@ class CameraViewController < UIViewController
     self.view = @camera_control
   end
 
-  def take_picture
-    @camera.take_picture do |image|
-      if image
-        @camera.stop_video
-        show_picture(image)
-      else
-        alert = UIAlertView.alloc.init
-        alert.title = "Error"
-        alert.message = "Can't capture picture"
-        alert.addButtonWithTitle('OK')
-        alert.show
-      end
+  def handle_picture(image)
+    if image
+      show_picture(image)
+    else
+      alert = UIAlertView.alloc.init
+      alert.title = "Error"
+      alert.message = "Can't capture picture"
+      alert.addButtonWithTitle('OK')
+      alert.show
     end
   end
 
@@ -74,7 +71,4 @@ class CameraViewController < UIViewController
     @camera.light_brightness = brightness
   end
 
-  def zoom(scale)
-    @camera.zoom(scale.abs)
-  end
 end
