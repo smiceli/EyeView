@@ -8,11 +8,15 @@ class CameraView < UIView
   def initWithFrame(frame, camera)
     if super_initWithFrame(frame)
       @camera = camera
-      self.backgroundColor = UIColor.blackColor
-      self.add_zoom_gestures
-      self.add_freeze_gesture
+      self.setup_view
     end
     self
+  end
+
+  def setup_view
+    self.backgroundColor = UIColor.blackColor
+    self.add_zoom_gestures
+    self.add_freeze_gesture
   end
 
   def add_zoom_gestures
