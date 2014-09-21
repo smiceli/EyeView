@@ -7,13 +7,9 @@ class CameraControlView < UIView
   def init_with_camera(camera, frame)
     if super_initWithFrame(frame)
       @camera = camera
-      self.init_view
+      self.add_sub_views
     end
     self
-  end
-
-  def init_view
-    self.add_sub_views
   end
 
   def add_sub_views
