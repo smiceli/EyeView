@@ -5,7 +5,7 @@ class EyeView < UIView
 
   def initWithFrame(frame)
     if super
-      self.backgroundColor = UIColor.redColor
+      self.backgroundColor = UIColor.blackColor
       self.add_zoom_gestures
       self.add_freeze_gesture
     end
